@@ -88,7 +88,7 @@
     </MenuBar>
     <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
       <children>
-            <ListView id="songView" layoutX="32.0" layoutY="91.0" prefHeight="200.0" prefWidth="163.0" />
+            <ListView fx:id="songView" layoutX="32.0" layoutY="91.0" prefHeight="200.0" prefWidth="163.0" />
             <Text layoutX="69.0" layoutY="80.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Song List Display" />
             <TextArea editable="false" layoutX="211.0" layoutY="148.0" prefHeight="79.0" prefWidth="260.0" text="Name:&#10;Artist:&#10;Album:&#10;Year:" />
             <Text layoutX="310.0" layoutY="142.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Song Detail" />
@@ -97,14 +97,14 @@
             <Button id="addb" layoutX="554.0" layoutY="38.0" mnemonicParsing="false" text="Add" onAction="#addSong" />
             <Button id="editb" layoutX="555.0" layoutY="204.0" mnemonicParsing="false" text="Edit" />
             <Button layoutX="49.0" layoutY="299.0" mnemonicParsing="false" text="Delete Selected Song" />
-            <TextField id="nameadd" layoutX="482.0" layoutY="63.0" prefHeight="17.0" prefWidth="144.0" promptText="Name (Required)" />
-            <TextField id="artistadd" layoutX="482.0" layoutY="88.0" prefHeight="17.0" prefWidth="144.0" promptText="Artist (Required)" />
-            <TextField id="yearadd" layoutX="482.0" layoutY="113.0" prefHeight="17.0" prefWidth="144.0" promptText="Year" />
-            <TextField id="albumadd" layoutX="482.0" layoutY="136.0" prefHeight="17.0" prefWidth="144.0" promptText="Album" />
-            <TextField id="nameedit" layoutX="482.0" layoutY="227.0" prefHeight="17.0" prefWidth="144.0" promptText="Name" />
-            <TextField id="artistedit" layoutX="482.0" layoutY="252.0" prefHeight="17.0" prefWidth="144.0" promptText="Artist" />
-            <TextField id="yearedit" layoutX="482.0" layoutY="277.0" prefHeight="17.0" prefWidth="144.0" promptText="Year" />
-            <TextField id="albumedit" layoutX="482.0" layoutY="302.0" prefHeight="17.0" prefWidth="144.0" promptText="Album" />
+            <TextField fx:id="nameadd" layoutX="482.0" layoutY="63.0" prefHeight="17.0" prefWidth="144.0" promptText="Name (Required)" />
+            <TextField fx:id="artistadd" layoutX="482.0" layoutY="88.0" prefHeight="17.0" prefWidth="144.0" promptText="Artist (Required)" />
+            <TextField fx:id="yearadd" layoutX="482.0" layoutY="113.0" prefHeight="17.0" prefWidth="144.0" promptText="Year" />
+            <TextField fx:id="albumadd" layoutX="482.0" layoutY="136.0" prefHeight="17.0" prefWidth="144.0" promptText="Album" />
+            <TextField fx:id="nameedit" layoutX="482.0" layoutY="227.0" prefHeight="17.0" prefWidth="144.0" promptText="Name" />
+            <TextField fx:id="artistedit" layoutX="482.0" layoutY="252.0" prefHeight="17.0" prefWidth="144.0" promptText="Artist" />
+            <TextField fx:id="yearedit" layoutX="482.0" layoutY="277.0" prefHeight="17.0" prefWidth="144.0" promptText="Year" />
+            <TextField fx:id="albumedit" layoutX="482.0" layoutY="302.0" prefHeight="17.0" prefWidth="144.0" promptText="Album" />
       </children>
     </AnchorPane>
   </children>

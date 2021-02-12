@@ -9,6 +9,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import songlib.resources.Song;
 
+
 public class SonglibController {
 	@FXML Button addb;
 	@FXML Button editb;
@@ -22,6 +23,7 @@ public class SonglibController {
 	@FXML TextField albumedit;
 	@FXML ListView<String> songView; //songView is the fx:id in .fxml file -- Andrew 02/12/2021
 	private ObservableList<String> songListObj; //-- Andrew 02/12/2021
+	
 	public void addSong(ActionEvent e) {
 		Button b = (Button)e.getSource();
 		if(b == addb) {
@@ -47,13 +49,18 @@ public class SonglibController {
 			}
 			Song addedSong = new Song(name, artist, year, album);			
 		}
-
+		
 	}
 	
 	//-- Andrew 02/12/2021
 	public void startList() {
 		songListObj = FXCollections.observableArrayList("Song1", "Song2");
-		songView.setItems(songListObj);
+		//System.out.println(songListObj);
+		try {
+			songView.setItems(songListObj);
+		} catch (Exception e) {
+			System.out.println(e);
+		}
 	}
 	
 }
