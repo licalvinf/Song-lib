@@ -82,7 +82,7 @@ public class SonglibController {
 		}
 	}
 	public void deleteSong(ActionEvent e) {
-		Button b = (Button)e.GetSource();
+		//Button b = (Button)e.GetSource();
 		
 		
 	}
