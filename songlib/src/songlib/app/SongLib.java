@@ -17,7 +17,7 @@ public class SongLib extends Application {
 		
 		//Added listcontroller for the songView list -- Andrew 02/12/2021
 		SonglibController listCtrl = loader.getController();
-		listCtrl.startList();
+		listCtrl.startList(primaryStage);
 		
 		Scene scene = new Scene(root);
 		primaryStage.setScene(scene);
