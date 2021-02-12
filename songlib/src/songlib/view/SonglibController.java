@@ -42,9 +42,19 @@ public class SonglibController {
 			else {
 				album = yearadd.getText();
 			}
+			
+			nameadd.setText("");
+			artistadd.setText("");
+			yearadd.setText("");
+			albumadd.setText("");
 			Song addedSong = new Song(name, artist, year, album);			
 		}
-
 	}
-	
+	public void editSong(ActionEvent e) {
+		Button b = (Button)e.getSource();
+		if(b == editb) {
+			//TOADD: Get song details from ListController
+			Song retrievedSong = null;
+		}
+	}
 }
