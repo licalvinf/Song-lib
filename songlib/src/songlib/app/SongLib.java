@@ -2,6 +2,7 @@ package songlib.app;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
+import songlib.view.SonglibController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
@@ -13,6 +14,11 @@ public class SongLib extends Application {
 		FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(getClass().getResource("/songlib/view/songlib.fxml"));
 		VBox root = (VBox)loader.load();
+		
+		//Added listcontroller for the songView list -- Andrew 02/12/2021
+		SonglibController listCtrl = loader.getController();
+		listCtrl.startList(primaryStage);
+		
 		Scene scene = new Scene(root);
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("Song Library");
