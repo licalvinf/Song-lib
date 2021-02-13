@@ -16,6 +16,11 @@ public class Song {
 	public String getSongDetails() {
 		return "Name: " + this.name + "\n Artist: " + this.artist + "\n Year: " + this.year + "\n Album: " + this.album;
 	}
+	public String getSongID() {
+		String id = this.name+this.artist;
+		id = id.toLowerCase();
+		return id;
+	}
 	@Override
 	public String toString() {
 		return this.name + " | By: " + this.artist;

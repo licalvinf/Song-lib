@@ -15,6 +15,7 @@ import songlib.resources.Song;
 public class SonglibController {
 	@FXML Button addb;
 	@FXML Button editb;
+	@FXML Button deleteb;
 	@FXML TextField nameadd;
 	@FXML TextField nameedit;
 	@FXML TextField artistadd;
@@ -114,7 +115,12 @@ public class SonglibController {
 		}
 	}
 	public void deleteSong(ActionEvent e) {
-		//Button b = (Button)e.GetSource();
+		Button b = (Button)e.getSource();
+		if(b == deleteb){
+			int currIndex = songView.getSelectionModel().getSelectedIndex();
+			songListObj.remove(currIndex);
+			songView.getSelectionModel().select(currIndex);
+		}
 		
 		
 
