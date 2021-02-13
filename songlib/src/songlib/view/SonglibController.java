@@ -23,15 +23,11 @@ public class SonglibController {
 	@FXML TextField yearedit;
 	@FXML TextField albumadd;
 	@FXML TextField albumedit;
-	@FXML ListView<String> songView; //songView is the fx:id in .fxml file -- Andrew 02/12/2021
+	@FXML ListView<Song> songView; //songView is the fx:id in .fxml file -- Andrew 02/12/2021
 	@FXML TextArea songDetails; //Song Details for selections
-	private ObservableList<String> songListObj; //-- Andrew 02/12/2021
-	
-	Song selectedSong = null;
-	
-	public void transferSong(Song s) {
-		selectedSong = s;
-	}
+	private ObservableList<Song> songListObj; //-- Andrew 02/12/2021
+
+	// deleted song selection stuff meant for a two controller implementation -- Calvin 02/12/2021
 	
 	public void addSong(ActionEvent e) {
 		Button b = (Button)e.getSource();
@@ -70,10 +66,10 @@ public class SonglibController {
 	
 	//-- Andrew 02/12/2021
 	public void startList(Stage primaryStage) {
-		songListObj = FXCollections.observableArrayList("Song1\nArtist1\nAlbum1\n2000", "Song2\nArtist2\nAlbum2\n2002");
+		songListObj = FXCollections.observableArrayList(new Song("a","b","c","d"));
 		//System.out.println(songListObj);
 		try {
-			songView.setItems(songListObj);
+		songView.setItems(songListObj);
 		} catch (Exception e) {
 			System.out.println(e);
 		}
@@ -87,12 +83,9 @@ public class SonglibController {
 	//Handles songView selection
 	private void handleSelection(Stage primaryStage) {
 		//Route songView selection to songDetails for display
-		String selectedSong = songView.getSelectionModel().getSelectedItem();
-		String[] songElements = selectedSong.split("\n");
-		String name = songElements[0]; String artist = songElements[1];
-		String album = songElements[2]; String year = songElements[3];
-		String outputDetails = String.format("Name:\t\t%s\nArtist:\t\t%s\nAlbum:\t\t%s\nYear:\t\t%s", name, artist, album, year);
-		//System.out.println(outputDetails);
+		Song selectedSong = songView.getSelectionModel().getSelectedItem();
+		String outputDetails = selectedSong.getSongDetails();
+		System.out.println(outputDetails);
 		songDetails.setText(outputDetails);
 
 	}

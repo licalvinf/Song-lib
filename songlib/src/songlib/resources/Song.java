@@ -12,6 +12,10 @@ public class Song {
 		year = y;
 		album = alb;		
 	}
+
+	public String getSongDetails() {
+		return "Name: " + this.name + "\n Artist: " + this.artist + "\n Year: " + this.year + "\n Album: " + this.album;
+	}
 	@Override
 	public String toString() {
 		return this.name + " | By: " + this.artist;
