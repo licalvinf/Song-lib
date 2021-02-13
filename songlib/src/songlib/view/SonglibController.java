@@ -1,5 +1,9 @@
 package songlib.view;
 
+
+
+
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -23,14 +27,88 @@ public class SonglibController {
 	@FXML TextField yearedit;
 	@FXML TextField albumadd;
 	@FXML TextField albumedit;
-	@FXML ListView<String> songView; //songView is the fx:id in .fxml file -- Andrew 02/12/2021
+	@FXML ListView<Song> songView; //songView is the fx:id in .fxml file -- Andrew 02/12/2021
 	@FXML TextArea songDetails; //Song Details for selections
-	private ObservableList<String> songListObj; //-- Andrew 02/12/2021
+	private ObservableList<Song> songListObj; //-- Andrew 02/12/2021
+	private Song selectedSong;
+	private Song[] sortedSongs;
 	
-	Song selectedSong = null;
+	private int[] mergeSortR(int[] unsortedSongs, int startIndex, int endIndex) {
+		int n = endIndex - startIndex + 1;
+		if( (n) == 0 || (n) == 1) {
+			System.out.println("Reached base");
+			
+			if(n == 1) {
+				int[] baseArray = new int[n];
+				System.out.println("Returning array: ");
+				baseArray[0] = unsortedSongs[startIndex];
+				printArray(baseArray);
+				return baseArray; // as automatically sorted
+			}
+		}
+		int endA = n/2 - 1;
+		int startB = n/2;
+		//Sort first half
+		System.out.println(String.format("(L) Recursing on start: %s end: %s", startIndex, endA ));
+		int[] firstHalf = mergeSortR(unsortedSongs, startIndex, endA);
+		printArray(firstHalf);
+		//Sort second half
+		System.out.println(String.format("(R) Recursing on start: %s end: %s", startB, endIndex ));
+		int[] secondHalf = mergeSortR(unsortedSongs, startB, endIndex);
+		printArray(secondHalf);
+		int[] merged = merge(firstHalf, secondHalf);
+		
+		//Copy over merged into original
+		for (int i = startIndex; i < endIndex + 1; i++) {
+			unsortedSongs[i] = merged[i];
+		}
+		
+		printArray(merged);
+		return merged;
+		
+	}
 	
-	public void transferSong(Song s) {
-		selectedSong = s;
+	//working Merge with two input int[] arrays
+	private int[] merge(int[] firstHalf, int[] secondHalf) {
+		int n = firstHalf.length + secondHalf.length;
+		int[] mergedSongs = new int[n];
+		int pointer1 = 0;
+		int pointer2 = 0;
+		for (int i = 0; i < mergedSongs.length; i++) {
+			if(pointer2 == secondHalf.length) {
+				mergedSongs[i] = firstHalf[pointer1];
+				//System.out.println("Case 1");
+				pointer1++;
+			} else if((pointer1 != firstHalf.length && firstHalf[pointer1] < secondHalf[pointer2])   ) {
+				mergedSongs[i] = firstHalf[pointer1];
+				//System.out.println("Case 2");
+				pointer1++;
+			}  else {
+				mergedSongs[i] = secondHalf[pointer2];
+				//System.out.println("Case 3");
+				pointer2++;
+			}
+		}
+		return mergedSongs;
+	}
+	
+	
+	
+	public void testMergeSort() {
+		int[] testMergeSort = new int[] {1, 2, 7, 8, 3, 4, 5, 6};
+		int[] sortedArray = mergeSortR(testMergeSort, 0, testMergeSort.length-1);
+		//int[] testMergeA = new int[] {1,2,7,8};
+		//int[] testMergeB = new int[] {3,4,5,6};
+		//int[] sortedArray = merge( testMergeA, testMergeB);
+		printArray(sortedArray);
+	}
+	
+	public void printArray(int[] array) {
+		for (int i = 0; i < array.length; i++) {
+			System.out.print(array[i]);
+		}
+		System.out.println();
+		System.out.println();
 	}
 	
 	public void addSong(ActionEvent e) {
@@ -64,13 +142,11 @@ public class SonglibController {
 			Song addedSong = new Song(name, artist, year, album);
 			//TOADD: Add song, check for existing song, reorder
 		}
-
-		
 	}
 	
 	//-- Andrew 02/12/2021
 	public void startList(Stage primaryStage) {
-		songListObj = FXCollections.observableArrayList("Song1\nArtist1\nAlbum1\n2000", "Song2\nArtist2\nAlbum2\n2002");
+		songListObj = FXCollections.observableArrayList( new Song("Song1", "Artist1", "2000", "Album1"), new Song("Song2", "Artist2", "2002", "Album2"));
 		//System.out.println(songListObj);
 		try {
 			songView.setItems(songListObj);
@@ -78,8 +154,11 @@ public class SonglibController {
 			System.out.println(e);
 		}
 		
-		
-		songView.getSelectionModel().select(0); //Default selects first song
+		//Default selects first song
+		songView.getSelectionModel().select(0); 
+		//Show default
+		handleSelection(primaryStage);
+		//Show subsequent selections
 		songView.getSelectionModel().selectedIndexProperty()
 		.addListener((obj, before, after) -> handleSelection(primaryStage));; //Set selection listener
 	}
@@ -87,11 +166,11 @@ public class SonglibController {
 	//Handles songView selection
 	private void handleSelection(Stage primaryStage) {
 		//Route songView selection to songDetails for display
-		String selectedSong = songView.getSelectionModel().getSelectedItem();
-		String[] songElements = selectedSong.split("\n");
+		this.selectedSong = songView.getSelectionModel().getSelectedItem();
+		String[] songElements = selectedSong.getDetails().split("\n");
 		String name = songElements[0]; String artist = songElements[1];
-		String album = songElements[2]; String year = songElements[3];
-		String outputDetails = String.format("Name:\t\t%s\nArtist:\t\t%s\nAlbum:\t\t%s\nYear:\t\t%s", name, artist, album, year);
+		String album = songElements[3]; String year = songElements[2];
+		String outputDetails = String.format("Name:\t\t%s\nArtist:\t\t%s\nAlbum:\t\t%s\nYear:\t\t\t%s", name, artist, album, year);
 		//System.out.println(outputDetails);
 		songDetails.setText(outputDetails);
 
@@ -99,19 +178,17 @@ public class SonglibController {
 	public void editSong(ActionEvent e) {
 		Button b = (Button)e.getSource();
 		if(b == editb) {
-			//TOADD: Get Song object from ListController
-			Song selectedSong = new Song("a","b","c","d");
 			if(!(nameedit.getText().isEmpty())) {
-				selectedSong.name = nameedit.getText();
+				this.selectedSong.name = nameedit.getText();
 			}
 			if(!(artistedit.getText().isEmpty())) {
-				selectedSong.artist = artistedit.getText();
+				this.selectedSong.artist = artistedit.getText();
 			}
 			if(!(yearedit.getText().isEmpty())) {
-				selectedSong.year = yearedit.getText();
+				this.selectedSong.year = yearedit.getText();
 			}
 			if(!(albumedit.getText().isEmpty())) {
-				selectedSong.album = albumedit.getText();
+				this.selectedSong.album = albumedit.getText();
 			}
 			nameedit.setText("");
 			artistedit.setText("");

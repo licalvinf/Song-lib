@@ -19,6 +19,9 @@ public class SongLib extends Application {
 		SonglibController listCtrl = loader.getController();
 		listCtrl.startList(primaryStage);
 		
+		listCtrl.testMergeSort();
+		
+		
 		Scene scene = new Scene(root);
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("Song Library");

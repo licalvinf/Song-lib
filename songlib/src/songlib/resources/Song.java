@@ -16,4 +16,7 @@ public class Song {
 	public String toString() {
 		return this.name + " | By: " + this.artist;
 	}
+	public String getDetails() {
+		return String.format("%s\n%s\n%s\n%s", this.name, this.artist, this.year, this.album); 
+	}
 }
