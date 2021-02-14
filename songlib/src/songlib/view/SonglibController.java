@@ -33,102 +33,71 @@ public class SonglibController {
 	private Song selectedSong;
 	private Song[] sortedSongs;
 	
-	//Works on ints now
-	private int[] mergeSortR(int[] unsortedSongs, int startIndex, int endIndex) {
+	//Inputs: (Song array to be sorted, 0, length of Song array - 1)
+	//Outputs: SORTED Song array
+	private Song[] mergeSortR(Song[] unsortedSongs, int startIndex, int endIndex) {
 		int n = endIndex - startIndex + 1;
 		if( (n) == 0 || (n) == 1) {
-			//System.out.println("Reached base");
-			
 			if(n == 1) {
-				int[] baseArray = new int[n];
-				//System.out.println("Returning array: ");
+				Song[] baseArray = new Song[n];
 				baseArray[0] = unsortedSongs[startIndex];
-				//printArray(baseArray);
 				return baseArray; // as automatically sorted
-			} else {
-				return null;
-			}
+			} else {return null;}
 		}
 		int endA = startIndex + n/2 - 1;
 		int startB = startIndex + n/2;
-		//Sort first half
-		//System.out.println(String.format("(L) Recursing on start: %s end: %s", startIndex, endA ));
-		int[] firstHalf = mergeSortR(unsortedSongs, startIndex, endA);
-		//printArray(firstHalf);
-		//Sort second half
-		//System.out.println(String.format("(R) Recursing on start: %s end: %s", startB, endIndex ));
-		int[] secondHalf = mergeSortR(unsortedSongs, startB, endIndex);
-		//printArray(secondHalf);
-		int[] merged = merge(firstHalf, secondHalf);
-		
-		//Copy over merged into original
-		for (int i = startIndex; i < merged.length; i++) {
-			unsortedSongs[i] = merged[i];
-		}
-		
-		//printArray(merged);
+		Song[] firstHalf = mergeSortR(unsortedSongs, startIndex, endA);
+		Song[] secondHalf = mergeSortR(unsortedSongs, startB, endIndex);
+		Song[] merged = merge(firstHalf, secondHalf);
+		for (int i = startIndex; i < merged.length; i++) {unsortedSongs[i] = merged[i];}
 		return merged;
-		
 	}
 	
-	//working on ints
-	private int[] merge(int[] firstHalf, int[] secondHalf) {
+	//Inputs: (SORTED first half of Song array, SORTED second half of a Song array)
+	//Outputs: SORTED merged array
+	private Song[] merge(Song[] firstHalf, Song[] secondHalf) {
 		int n = firstHalf.length + secondHalf.length;
-		int[] mergedSongs = new int[n];
-		int pointer1 = 0;
-		int pointer2 = 0;
+		Song[] mergedSongs = new Song[n];
+		int pointer1 = 0; int pointer2 = 0;
 		for (int i = 0; i < mergedSongs.length; i++) {
 			if(pointer2 == secondHalf.length) {
 				mergedSongs[i] = firstHalf[pointer1];
-				//System.out.println("Case 1");
 				pointer1++;
-			} else if((pointer1 != firstHalf.length && firstHalf[pointer1] < secondHalf[pointer2])   ) {
+			} else if((pointer1 != firstHalf.length && firstHalf[pointer1].compareTo(secondHalf[pointer2]) < 0 )   ) {
 				mergedSongs[i] = firstHalf[pointer1];
-				//System.out.println("Case 2");
 				pointer1++;
 			}  else {
 				mergedSongs[i] = secondHalf[pointer2];
-				//System.out.println("Case 3");
 				pointer2++;
 			}
 		}
 		return mergedSongs;
 	}
 	
-	//Working for ints
-	private int binarySearchR(int[] array, int startIndex , int endIndex, int target) {
-		if(array.length == 0 || startIndex > endIndex) {
-			System.out.println("Target not found!");
-			return -1;
-		}
-		int n = endIndex - startIndex + 1;
-		int m = startIndex + n/2;
-		if(array[m] == target) {
-			return m;
-		}
-		else if(target < array[m]) {
-			System.out.println(String.format("(target less than) Recursing on array from start: %s to end: %s", startIndex, m-1));
-			return binarySearchR(array, startIndex, m- 1, target);
-		}
-		else {
-			System.out.println(String.format("(target more than) Recursing on array from start: %s to end: %s", m+ 1, endIndex));
-			return binarySearchR(array, m+1, endIndex, target);
-		}
+	//Inputs: (Song array, 0, Song array length - 1, Song to search)
+	//Outputs: Index: -1 if not found, otherwise positive index where target is found
+	private int binarySearchR(Song[] array, int startIndex , int endIndex, Song target) {
+		if(array.length == 0 || startIndex > endIndex) {return -1;}
+		int m = startIndex + (endIndex - startIndex + 1)/2;
+		if(array[m].compareTo(target)  == 0) {return m;}
+		else if(target.compareTo(array[m]) < 0) {return binarySearchR(array, startIndex, m- 1, target);}
+		else {return binarySearchR(array, m+1, endIndex, target);}
 	}
 	
 	public void testMergeSort() {
-		int[] testMergeSort = new int[] {1, 2, 7, 8, 3, 4, 5, 6, 22, 11, 2, 4, 5, 7, 3};
-		int[] sortedArray = mergeSortR(testMergeSort, 0, testMergeSort.length-1);
-		//int[] testMergeA = new int[] {1,2,7,8};
-		//int[] testMergeB = new int[] {3,4,5,6};
-		//int[] sortedArray = merge( testMergeA, testMergeB);
-		printArray(sortedArray);
-		System.out.println(binarySearchR(sortedArray, 0, sortedArray.length-1, 5));
+		Song[] testSongList = new Song[] {new Song("AB", "BC", "2000", "Album1"), 
+				new Song("BB", "CC", "2001", "Album2"), 
+				new Song("AB", "CD", "2002", "Album1")};
+		Song[] sortedSongList = mergeSortR(testSongList, 0, testSongList.length - 1);
+		printArray(sortedSongList);
+		
+		Song target = new Song("BB", "CC", "2001", "Album3");
+		System.out.println(binarySearchR(sortedSongList, 0, sortedSongList.length-1, target));
 	}
 	
-	public void printArray(int[] array) {
-		for (int i = 0; i < array.length; i++) {
-			System.out.print(array[i] );
+	public void printArray(Song[] songList) {
+		for (int i = 0; i < songList.length; i++) {
+			System.out.print(songList[i] );
 			System.out.print(" ");
 		}
 		System.out.println();
