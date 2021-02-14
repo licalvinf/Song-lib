@@ -12,14 +12,8 @@ public class Song {
 		year = y;
 		album = alb;		
 	}
-
-	public String getSongDetails() {
-		return "Name: " + this.name + "\n Artist: " + this.artist + "\n Year: " + this.year + "\n Album: " + this.album;
-	}
-	public String getSongID() {
-		String id = this.name+this.artist;
-		id = id.toLowerCase();
-		return id;
+	public String getCSV() {
+		return String.format("%s|%s|%s|%s", this.name, this.artist,this.year,this.album);
 	}
 	@Override
 	public String toString() {

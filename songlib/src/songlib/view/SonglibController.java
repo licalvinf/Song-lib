@@ -4,7 +4,15 @@ package songlib.view;
 
 
 
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,6 +22,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.MenuItem;
 import javafx.stage.Stage;
 import songlib.resources.Song;
 
@@ -32,6 +41,8 @@ public class SonglibController {
 	@FXML TextField albumedit;
 	@FXML ListView<Song> songView; //songView is the fx:id in .fxml file -- Andrew 02/12/2021
 	@FXML TextArea songDetails; //Song Details for selections
+	@FXML MenuItem openCSV;
+	@FXML MenuItem saveCSV;
 	private ObservableList<Song> songListObj; //-- Andrew 02/12/2021
 	private Song selectedSong;
 	
@@ -153,7 +164,7 @@ public class SonglibController {
 				album = "<No Info>";
 			}
 			else {
-				album = yearadd.getText();
+				album = albumadd.getText();
 			}
 			
 			nameadd.setText("");
@@ -161,7 +172,10 @@ public class SonglibController {
 			yearadd.setText("");
 			albumadd.setText("");
 			Song addedSong = new Song(name, artist, year, album);
-			//TOADD: Add song, check for existing song, reorder
+			//if (binarySearchR>0), display error message.
+			//else:
+			songListObj.add(addedSong);
+			//call mergesort function		
 		}
 	}
 	
@@ -175,8 +189,7 @@ public class SonglibController {
 			System.out.println(e);
 		}
 		
-		//Default selects first song
-		songView.getSelectionModel().select(0); 
+		//Default selects first song 
 		//Show default
 		handleSelection(primaryStage);
 		//Show subsequent selections
@@ -187,6 +200,25 @@ public class SonglibController {
 	//Handles songView selection
 	private void handleSelection(Stage primaryStage) {
 		//Route songView selection to songDetails for display
+		if (songView.getSelectionModel().isEmpty()) {
+			songDetails.setText("");
+			return;
+		}
+		this.selectedSong = songView.getSelectionModel().getSelectedItem();
+		String[] songElements = selectedSong.getDetails().split("\n");
+		String name = songElements[0]; String artist = songElements[1];
+		String album = songElements[3]; String year = songElements[2];
+		String outputDetails = String.format("Name:\t\t%s\nArtist:\t\t%s\nAlbum:\t\t%s\nYear:\t\t\t%s", name, artist, album, year);
+		//System.out.println(outputDetails);
+		songDetails.setText(outputDetails);
+
+	}
+	private void handleSelection() {
+		//Route songView selection to songDetails for display
+		if (songView.getSelectionModel().isEmpty()) {
+			songDetails.setText("");
+			return;
+		}
 		this.selectedSong = songView.getSelectionModel().getSelectedItem();
 		String[] songElements = selectedSong.getDetails().split("\n");
 		String name = songElements[0]; String artist = songElements[1];
@@ -199,34 +231,101 @@ public class SonglibController {
 	public void editSong(ActionEvent e) {
 		Button b = (Button)e.getSource();
 		if(b == editb) {
+			Song tempSong = this.selectedSong;
 			if(!(nameedit.getText().isEmpty())) {
-				this.selectedSong.name = nameedit.getText();
+				tempSong.name = nameedit.getText();
 			}
 			if(!(artistedit.getText().isEmpty())) {
-				this.selectedSong.artist = artistedit.getText();
+				tempSong.artist = artistedit.getText();
 			}
 			if(!(yearedit.getText().isEmpty())) {
-				this.selectedSong.year = yearedit.getText();
+				tempSong.year = yearedit.getText();
 			}
 			if(!(albumedit.getText().isEmpty())) {
-				this.selectedSong.album = albumedit.getText();
+				tempSong.album = albumedit.getText();
 			}
 			nameedit.setText("");
 			artistedit.setText("");
 			yearedit.setText("");
 			albumedit.setText("");
-			//TOADD: Check for existing song, reorder
+			//if (binarySearchR>0), display error message.
+			//else:
+			this.selectedSong = tempSong;
+			handleSelection();
+			try {
+				songView.setItems(songListObj);
+				} catch (Exception e1) {
+					System.out.println(e1);
+				}
+			//call mergesort function
 		}
 	}
 	public void deleteSong(ActionEvent e) {
 		Button b = (Button)e.getSource();
 		if(b == deleteb){
+			if(songView.getItems().isEmpty()) {
+				return;
+			}
 			int currIndex = songView.getSelectionModel().getSelectedIndex();
 			songListObj.remove(currIndex);
 			songView.getSelectionModel().select(currIndex);
+			handleSelection();
 		}
+	}
+	public void readCSV(ActionEvent e) {
+		MenuItem m = (MenuItem)e.getSource();
+		if(m == openCSV) {
+			File file = new File("C:/data/songlibCSV.txt");
+			if(!file.exists()) {
+				return;
+			}
+			try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file));) {
+				String line = bufferedReader.readLine();
+				String tempSong=null; String tempArtist=null; String tempYear=null; String tempAlbum=null;
+				String[] lineParts = line.split("\\|");
+				tempSong = lineParts[0];
+				tempArtist = lineParts[1];
+				tempYear = lineParts[2];
+				tempAlbum = lineParts[3];
+				line = bufferedReader.readLine();	
+				songListObj.setAll(new Song(tempSong, tempArtist, tempYear, tempAlbum));
+				songView.getSelectionModel().select(0);
+				handleSelection();
+				while (line!=null) {
+					lineParts = line.split("\\|");
+					tempSong = lineParts[0];
+					tempArtist = lineParts[1];
+					tempYear = lineParts[2];
+					tempAlbum = lineParts[3];
+					songListObj.add(new Song(tempSong, tempArtist, tempYear, tempAlbum));	
+					line = bufferedReader.readLine();
+				}
+				bufferedReader.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
+	}
+	public void writeCSV(ActionEvent e) {
+		MenuItem m = (MenuItem)e.getSource();
+		if(m == saveCSV) {
+			File file = new File("C:/data/songlibCSV.txt");
+			if (!file.exists()) {
+				file.getParentFile().mkdirs();
+			}
+			try (BufferedWriter bufferedWriter  = new BufferedWriter(new FileWriter(file, false));) {
+				for (Song s : songListObj) {
+					bufferedWriter.write(s.getCSV() +"\n");
+				}
+				bufferedWriter.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
+		
+	}
 		
 		
 
-	}
+	
 }
