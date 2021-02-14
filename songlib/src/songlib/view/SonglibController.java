@@ -4,6 +4,8 @@ package songlib.view;
 
 
 
+import java.util.ArrayList;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -32,7 +34,6 @@ public class SonglibController {
 	@FXML TextArea songDetails; //Song Details for selections
 	private ObservableList<Song> songListObj; //-- Andrew 02/12/2021
 	private Song selectedSong;
-	private Song[] sortedSongs;
 	
 	//Inputs: (Song array to be sorted, 0, length of Song array - 1)
 	//Outputs: SORTED Song array
@@ -85,15 +86,41 @@ public class SonglibController {
 		else {return binarySearchR(array, m+1, endIndex, target);}
 	}
 	
-	public void testMergeSort() {
-		Song[] testSongList = new Song[] {new Song("AB", "BC", "2000", "Album1"), 
-				new Song("BB", "CC", "2001", "Album2"), 
-				new Song("AB", "CD", "2002", "Album1")};
-		Song[] sortedSongList = mergeSortR(testSongList, 0, testSongList.length - 1);
-		printArray(sortedSongList);
-		
-		Song target = new Song("BB", "CC", "2001", "Album3");
-		System.out.println(binarySearchR(sortedSongList, 0, sortedSongList.length-1, target));
+	private void sortSongList() {
+		Song[] convertedArr = O2A(this.songListObj);
+		Song[] sortedArr = mergeSortR(convertedArr, 0, convertedArr.length - 1);
+		this.songListObj = A2O(sortedArr);
+		printSongList(this.songListObj);
+	}
+	
+	private int searchSongList(Song target) {
+		return binarySearchR(O2A(this.songListObj), 0, this.songListObj.size() - 1, target);
+	}
+	
+	
+	private Song[] O2A(ObservableList<Song> input) {
+		Song[] newArr = new Song[input.size()];
+		for (int i = 0; i<input.size();i++) {
+			newArr[i] = input.get(i);
+		}
+		return newArr;
+	}
+	
+	private ObservableList<Song> A2O(Song[] input){
+		ObservableList<Song> returnObj = FXCollections.observableArrayList(new ArrayList<Song>());
+		for (int i = 0; i<input.length;i++) {
+			returnObj.add(input[i]);
+		}
+		return returnObj;
+	}
+	
+	private void printSongList(ObservableList<Song> input) {
+		for(int i = 0; i<input.size(); i++) {
+			System.out.print(input.get(i) );
+			System.out.print(" \n");
+		}
+		System.out.println();
+		System.out.println();
 	}
 	
 	public void printArray(Song[] songList) {
@@ -140,7 +167,7 @@ public class SonglibController {
 	
 	//-- Andrew 02/12/2021
 	public void startList(Stage primaryStage) {
-		songListObj = FXCollections.observableArrayList( new Song("Song1", "Artist1", "2000", "Album1"), new Song("Song2", "Artist2", "2002", "Album2"));
+		songListObj = FXCollections.observableArrayList( new Song("Song1", "Artist1", "2000", "Album1"), new Song("SongB", "ArtistA", "2002", "Album2"), new Song("SongA", "ArtistB", "2002", "Album3"));
 		//System.out.println(songListObj);
 		try {
 		songView.setItems(songListObj);
