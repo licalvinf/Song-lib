@@ -19,6 +19,7 @@ import songlib.resources.Song;
 public class SonglibController {
 	@FXML Button addb;
 	@FXML Button editb;
+	@FXML Button deleteb;
 	@FXML TextField nameadd;
 	@FXML TextField nameedit;
 	@FXML TextField artistadd;
@@ -142,7 +143,7 @@ public class SonglibController {
 		songListObj = FXCollections.observableArrayList( new Song("Song1", "Artist1", "2000", "Album1"), new Song("Song2", "Artist2", "2002", "Album2"));
 		//System.out.println(songListObj);
 		try {
-			songView.setItems(songListObj);
+		songView.setItems(songListObj);
 		} catch (Exception e) {
 			System.out.println(e);
 		}
@@ -191,7 +192,12 @@ public class SonglibController {
 		}
 	}
 	public void deleteSong(ActionEvent e) {
-		//Button b = (Button)e.GetSource();
+		Button b = (Button)e.getSource();
+		if(b == deleteb){
+			int currIndex = songView.getSelectionModel().getSelectedIndex();
+			songListObj.remove(currIndex);
+			songView.getSelectionModel().select(currIndex);
+		}
 		
 		
 
