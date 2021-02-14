@@ -33,6 +33,7 @@ public class SonglibController {
 	private Song selectedSong;
 	private Song[] sortedSongs;
 	
+	//Works on ints now
 	private int[] mergeSortR(int[] unsortedSongs, int startIndex, int endIndex) {
 		int n = endIndex - startIndex + 1;
 		if( (n) == 0 || (n) == 1) {
@@ -44,10 +45,12 @@ public class SonglibController {
 				baseArray[0] = unsortedSongs[startIndex];
 				printArray(baseArray);
 				return baseArray; // as automatically sorted
+			} else {
+				return null;
 			}
 		}
-		int endA = n/2 - 1;
-		int startB = n/2;
+		int endA = startIndex + n/2 - 1;
+		int startB = startIndex + n/2;
 		//Sort first half
 		System.out.println(String.format("(L) Recursing on start: %s end: %s", startIndex, endA ));
 		int[] firstHalf = mergeSortR(unsortedSongs, startIndex, endA);
@@ -59,7 +62,7 @@ public class SonglibController {
 		int[] merged = merge(firstHalf, secondHalf);
 		
 		//Copy over merged into original
-		for (int i = startIndex; i < endIndex + 1; i++) {
+		for (int i = startIndex; i < merged.length; i++) {
 			unsortedSongs[i] = merged[i];
 		}
 		
@@ -68,7 +71,7 @@ public class SonglibController {
 		
 	}
 	
-	//working Merge with two input int[] arrays
+	//working on ints
 	private int[] merge(int[] firstHalf, int[] secondHalf) {
 		int n = firstHalf.length + secondHalf.length;
 		int[] mergedSongs = new int[n];
@@ -95,7 +98,7 @@ public class SonglibController {
 	
 	
 	public void testMergeSort() {
-		int[] testMergeSort = new int[] {1, 2, 7, 8, 3, 4, 5, 6};
+		int[] testMergeSort = new int[] {1, 2, 7, 8, 3, 4, 5, 6, 22, 11, 2, 4, 5, 7, 3};
 		int[] sortedArray = mergeSortR(testMergeSort, 0, testMergeSort.length-1);
 		//int[] testMergeA = new int[] {1,2,7,8};
 		//int[] testMergeB = new int[] {3,4,5,6};
@@ -105,7 +108,8 @@ public class SonglibController {
 	
 	public void printArray(int[] array) {
 		for (int i = 0; i < array.length; i++) {
-			System.out.print(array[i]);
+			System.out.print(array[i] );
+			System.out.print(" ");
 		}
 		System.out.println();
 		System.out.println();
