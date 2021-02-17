@@ -154,7 +154,7 @@ public class SonglibController {
 		Button b = (Button)e.getSource();
 		if(b == addb) {
 			String name = null; String artist=null; String year=null; String album=null;
-			if(nameadd.getText().isEmpty() || artistadd.getText().isEmpty() ) {
+			if(nameadd.getText().isBlank() || artistadd.getText().isBlank() ) {
 				errorAlert("Add Alert","The song's name and artist must be filled out. The addition was cancelled.");
 				nameadd.setText("");
 				artistadd.setText("");
@@ -163,20 +163,20 @@ public class SonglibController {
 				return;
 			}
 			else {
-				name = nameadd.getText();
-				artist = artistadd.getText();
+				name = nameadd.getText().trim();
+				artist = artistadd.getText().trim();
 			}
-			if(yearadd.getText().isEmpty()) {
+			if(yearadd.getText().isBlank()) {
 				year = "<No Info>";
 			}
 			else {
-				year = yearadd.getText();
+				year = yearadd.getText().trim();
 			}
-			if(albumadd.getText().isEmpty()) {
+			if(albumadd.getText().isBlank()) {
 				album = "<No Info>";
 			}
 			else {
-				album = albumadd.getText();
+				album = albumadd.getText().trim();
 			}
 			
 			nameadd.setText("");
@@ -268,17 +268,17 @@ public class SonglibController {
 				return;
 			}
 			Song tempSong = new Song(this.selectedSong.name,this.selectedSong.artist,this.selectedSong.year,this.selectedSong.album);
-			if(!(nameedit.getText().isEmpty())) {
-				tempSong.name = nameedit.getText();
+			if(!(nameedit.getText().isBlank())) {
+				tempSong.name = nameedit.getText().trim();
 			}
-			if(!(artistedit.getText().isEmpty())) {
-				tempSong.artist = artistedit.getText();
+			if(!(artistedit.getText().isBlank())) {
+				tempSong.artist = artistedit.getText().trim();
 			}
-			if(!(yearedit.getText().isEmpty())) {
-				tempSong.year = yearedit.getText();
+			if(!(yearedit.getText().isBlank())) {
+				tempSong.year = yearedit.getText().trim();
 			}
-			if(!(albumedit.getText().isEmpty())) {
-				tempSong.album = albumedit.getText();
+			if(!(albumedit.getText().isBlank())) {
+				tempSong.album = albumedit.getText().trim();
 			}
 			nameedit.setText("");
 			artistedit.setText("");
