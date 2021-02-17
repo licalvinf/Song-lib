@@ -18,15 +18,15 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.MenuItem;
 import javafx.stage.Stage;
 import songlib.resources.Song;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType; 
 
 
 public class SonglibController {
@@ -47,7 +47,6 @@ public class SonglibController {
 	@FXML MenuItem saveCSV;
 	private ObservableList<Song> songListObj; //-- Andrew 02/12/2021
 	private Song selectedSong;
-	private Stage primaryStage;
 	
 	//Inputs: (Song array to be sorted, 0, length of Song array - 1)
 	//Outputs: SORTED Song array
@@ -109,7 +108,6 @@ public class SonglibController {
 			} catch (Exception e) {
 				System.out.println(e);
 			}
-		handleSelection();
 		printSongList(this.songListObj);
 	}
 	
@@ -157,7 +155,12 @@ public class SonglibController {
 		if(b == addb) {
 			String name = null; String artist=null; String year=null; String album=null;
 			if(nameadd.getText().isEmpty() || artistadd.getText().isEmpty() ) {
-				//TOADD: Throw Error Message
+				errorAlert("Add Alert","The song's name and artist must be filled out. The addition was cancelled.");
+				nameadd.setText("");
+				artistadd.setText("");
+				yearadd.setText("");
+				albumadd.setText("");
+				return;
 			}
 			else {
 				name = nameadd.getText();
@@ -183,10 +186,8 @@ public class SonglibController {
 			Song addedSong = new Song(name, artist, year, album);
 			//if (binarySearchR>0), display error message.
 			//else:
-			if(searchSongList(addedSong)== 0) {
-				// popup error message
-				System.out.println("Hello");
-				sendError(this.primaryStage, "This song already exists!\nTry again!");
+			if(searchSongList(addedSong)>=0) {
+				errorAlert("Add Alert","A song with this name and artist already exists. The song could not be added.");
 				return;
 			}
 			else
@@ -201,7 +202,6 @@ public class SonglibController {
 	
 	//-- Andrew 02/12/2021
 	public void startList(Stage primaryStage) {
-		this.primaryStage = primaryStage;
 		songListObj = FXCollections.observableArrayList( new Song("Song1", "Artist1", "2000", "Album1"), new Song("SongB", "ArtistA", "2002", "Album2"), new Song("SongA", "ArtistB", "2002", "Album3"));
 		//System.out.println(songListObj);
 		try {
@@ -210,11 +210,7 @@ public class SonglibController {
 			System.out.println(e);
 		}
 		
-		//Default selects first song if there ARE songs
-		if(this.songListObj.size() > 0) {
-			songView.getSelectionModel().select(0);
-		}
-		
+		//Default selects first song 
 		//Show default
 		handleSelection(primaryStage);
 		//Show subsequent selections
@@ -253,18 +249,25 @@ public class SonglibController {
 		songDetails.setText(outputDetails);
 
 	}
-	
-	private void sendError(Stage primaryStage, String errormessage) {
-		Alert message = new Alert(AlertType.ERROR);
-		message.initOwner(primaryStage);
-		message.setContentText(errormessage);
-		message.showAndWait();
+	public void errorAlert(String header, String message) {
+		Alert noSelectAlert = new Alert(AlertType.ERROR);
+		noSelectAlert.setTitle("Error");
+		noSelectAlert.setHeaderText(header);
+		noSelectAlert.setContentText(message);
+		noSelectAlert.show();
 	}
-	
 	public void editSong(ActionEvent e) {
 		Button b = (Button)e.getSource();
 		if(b == editb) {
-			Song tempSong = new Song(this.selectedSong.name,this.selectedSong.year,this.selectedSong.artist,this.selectedSong.album);
+			if(songView.getSelectionModel().isEmpty()) {
+				errorAlert("Illegal Edit", "No song was selected.");
+				nameedit.setText("");
+				artistedit.setText("");
+				yearedit.setText("");
+				albumedit.setText("");
+				return;
+			}
+			Song tempSong = new Song(this.selectedSong.name,this.selectedSong.artist,this.selectedSong.year,this.selectedSong.album);
 			if(!(nameedit.getText().isEmpty())) {
 				tempSong.name = nameedit.getText();
 			}
@@ -281,20 +284,19 @@ public class SonglibController {
 			artistedit.setText("");
 			yearedit.setText("");
 			albumedit.setText("");
-			if(searchSongList(tempSong)>0) {
-
+			if(searchSongList(tempSong)>=0) {
+				errorAlert("Edit Alert","A song with the same name and artist already exists. The edit was cancelled.");	
 				return;
 			}
 			else
 			{
-				this.selectedSong = tempSong;
+				songListObj.remove(songView.getSelectionModel().getSelectedIndex());
+				songListObj.add(tempSong);
 				sortSongList();
-				songView.getSelectionModel().select(searchSongList(this.selectedSong));
+				songView.getSelectionModel().select(searchSongList(tempSong));
 				handleSelection();
 			}
-			//if (binarySearchR>0), display error message.
-			//else:
-			//call mergesort function
+			
 		}
 	}
 	public void deleteSong(ActionEvent e) {
