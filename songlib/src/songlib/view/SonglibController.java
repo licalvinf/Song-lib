@@ -163,20 +163,20 @@ public class SonglibController {
 				return;
 			}
 			else {
-				name = nameadd.getText();
-				artist = artistadd.getText();
+				name = nameadd.getText().trim();
+				artist = artistadd.getText().trim();
 			}
 			if(yearadd.getText().isBlank()) {
 				year = "<No Info>";
 			}
 			else {
-				year = yearadd.getText();
+				year = yearadd.getText().trim();
 			}
 			if(albumadd.getText().isBlank()) {
 				album = "<No Info>";
 			}
 			else {
-				album = albumadd.getText();
+				album = albumadd.getText().trim();
 			}
 			
 			nameadd.setText("");
@@ -273,18 +273,17 @@ public class SonglibController {
 				errorAlert("Edit Alert","No input changes. The edit was cancelled.");
 				return;
 			}
-			
 			if(!(nameedit.getText().isBlank())) {
-				tempSong.name = nameedit.getText();
+				tempSong.name = nameedit.getText().trim();
 			}
 			if(!(artistedit.getText().isBlank())) {
-				tempSong.artist = artistedit.getText();
+				tempSong.artist = artistedit.getText().trim();
 			}
 			if(!(yearedit.getText().isBlank())) {
-				tempSong.year = yearedit.getText();
+				tempSong.year = yearedit.getText().trim();
 			}
 			if(!(albumedit.getText().isBlank())) {
-				tempSong.album = albumedit.getText();
+				tempSong.album = albumedit.getText().trim();
 			}
 			nameedit.setText("");
 			artistedit.setText("");
