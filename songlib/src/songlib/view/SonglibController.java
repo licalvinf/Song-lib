@@ -153,6 +153,7 @@ public class SonglibController {
 				albumadd.setText("");
 				return;
 			}
+			
 			else {
 				name = nameadd.getText().trim();
 				artist = artistadd.getText().trim();
@@ -170,30 +171,29 @@ public class SonglibController {
 				album = albumadd.getText().trim();
 			}
 			
-			if(!(nameedit.getText().isBlank())&&!(artistedit.getText().isBlank())) {
-				if(searchSongList(tempSong)>=0) {
-					errorAlert("Edit Alert","A song with the same name and artist already exists. The edit was cancelled.");	
-					return;
-				}
+			nameadd.setText("");
+			artistadd.setText("");
+			yearadd.setText("");
+			albumadd.setText("");
+			Song addedSong = new Song(name, artist, year, album);
+			if(searchSongList(addedSong)>=0) {
+				errorAlert("Add Alert","A song with this name and artist already exists. The song could not be added.");
+				return;
 			}
 			else
 			{
-				songListObj.remove(songView.getSelectionModel().getSelectedIndex());
-				songListObj.add(tempSong);
-				sortSongList();
-				songView.getSelectionModel().select(searchSongList(tempSong));
-				handleSelection();
-			}
-			nameedit.setText("");
-			artistedit.setText("");
-			yearedit.setText("");
-			albumedit.setText("");
+			songListObj.add(addedSong);
+			sortSongList();
+			songView.getSelectionModel().select(searchSongList(addedSong));
+			handleSelection();
+			}	
+			
 		}
 	}
 	
 	//-- Andrew 02/12/2021
 	public void startList(Stage primaryStage) {
-		this.songListObj = FXCollections.observableArrayList(new ArrayList());
+		this.songListObj = FXCollections.observableArrayList(new ArrayList<Song>());
 		//System.out.println(songListObj);
 		//this.songListObj = null;
 		try {
@@ -276,24 +276,28 @@ public class SonglibController {
 			if(!(albumedit.getText().isBlank())) {
 				tempSong.album = albumedit.getText().trim();
 			}
+			
+			if((!(nameedit.getText().isBlank()))&&(!(artistedit.getText().isBlank()))) {
+				if(searchSongList(tempSong)>=0) {
+					errorAlert("Edit Alert","A song with the same name and artist already exists. The edit was cancelled.");	
+					nameedit.setText("");
+					artistedit.setText("");
+					yearedit.setText("");
+					albumedit.setText("");
+					return;
+				}
+			}
+	
+			songListObj.remove(songView.getSelectionModel().getSelectedIndex());
+			songListObj.add(tempSong);
+			sortSongList();
+			songView.getSelectionModel().select(searchSongList(tempSong));
+			handleSelection();
+			
 			nameedit.setText("");
 			artistedit.setText("");
 			yearedit.setText("");
 			albumedit.setText("");
-			
-			
-			if(searchSongList(tempSong)>=0) {
-				errorAlert("Illegal Edit!","A song with the same name and artist already exists. The edit was cancelled.");	
-				return;
-			}
-			else
-			{
-				songListObj.remove(songView.getSelectionModel().getSelectedIndex());
-				songListObj.add(tempSong);
-				sortSongList();
-				songView.getSelectionModel().select(searchSongList(tempSong));
-				handleSelection();
-			}
 			
 		}
 	}
