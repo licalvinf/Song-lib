@@ -108,7 +108,7 @@ public class SonglibController {
 			} catch (Exception e) {
 				System.out.println(e);
 			}
-		printSongList(this.songListObj);
+		//printSongList(this.songListObj);
 	}
 	
 	private int searchSongList(Song target) {
@@ -132,7 +132,7 @@ public class SonglibController {
 		return returnObj;
 	}
 	
-	private void printSongList(ObservableList<Song> input) {
+	/*private void printSongList(ObservableList<Song> input) {
 		for(int i = 0; i<input.size(); i++) {
 			System.out.print(input.get(i) );
 			System.out.print(" \n");
@@ -140,6 +140,7 @@ public class SonglibController {
 		System.out.println();
 		System.out.println();
 	}
+	*/
 	
 	public void printArray(Song[] songList) {
 		for (int i = 0; i < songList.length; i++) {
@@ -280,13 +281,12 @@ public class SonglibController {
 			if(!(albumedit.getText().isBlank())) {
 				tempSong.album = albumedit.getText().trim();
 			}
-			nameedit.setText("");
-			artistedit.setText("");
-			yearedit.setText("");
-			albumedit.setText("");
-			if(searchSongList(tempSong)>=0) {
-				errorAlert("Edit Alert","A song with the same name and artist already exists. The edit was cancelled.");	
-				return;
+
+			if(!(nameedit.getText().isBlank())&&!(artistedit.getText().isBlank())) {
+				if(searchSongList(tempSong)>=0) {
+					errorAlert("Edit Alert","A song with the same name and artist already exists. The edit was cancelled.");	
+					return;
+				}
 			}
 			else
 			{
@@ -296,13 +296,18 @@ public class SonglibController {
 				songView.getSelectionModel().select(searchSongList(tempSong));
 				handleSelection();
 			}
+			nameedit.setText("");
+			artistedit.setText("");
+			yearedit.setText("");
+			albumedit.setText("");
 			
 		}
 	}
 	public void deleteSong(ActionEvent e) {
 		Button b = (Button)e.getSource();
 		if(b == deleteb){
-			if(songView.getItems().isEmpty()) {
+			if(songView.getSelectionModel().isEmpty()) {
+				errorAlert("Deletion alert","No songs were selected.");
 				return;
 			}
 			int currIndex = songView.getSelectionModel().getSelectedIndex();
@@ -318,7 +323,14 @@ public class SonglibController {
 			if(!file.exists()) {
 				return;
 			}
-			try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file));) {
+			try (BufferedReader bufferedReaderNull = new BufferedReader(new FileReader(file));) {
+				if(bufferedReaderNull.readLine()==null) {
+					errorAlert("Read Error","File is empty");
+					bufferedReaderNull.close();
+					return;
+				}
+				bufferedReaderNull.close();
+				try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file));){
 				String line = bufferedReader.readLine();
 				String tempSong=null; String tempArtist=null; String tempYear=null; String tempAlbum=null;
 				String[] lineParts = line.split("\\|");
@@ -340,6 +352,9 @@ public class SonglibController {
 					line = bufferedReader.readLine();
 				}
 				bufferedReader.close();
+				} catch (IOException e2) {
+					e2.printStackTrace();
+				}
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
