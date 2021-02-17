@@ -23,8 +23,25 @@ public class Song {
 		return String.format("%s\n%s\n%s\n%s", this.name, this.artist, this.year, this.album); 
 	}
 	public int compareTo(Song other) {
-		String concatThis = String.format("%s%s", this.name, this.artist);
-		String concatOther = String.format("%s%s", other.name, other.artist);
-		return concatThis.compareToIgnoreCase(concatOther);
+		if(this.name.compareToIgnoreCase( other.name) == 0 ) {
+			int checkArtist = this.artist.compareToIgnoreCase(other.artist);
+			if(checkArtist == 0) {
+				//Exactly same song by criteria
+				return 0;
+			} else if(checkArtist < 0) {
+				//Same name but this artist comes BEFORE
+				return -1;
+			} else {
+				//Same name but this artist comes AFTER
+				return 1;
+			}
+			
+		} else if(this.name.compareToIgnoreCase(other.name) < 0 ) {
+			//This name comes BEFORE
+			return -1;
+		} else {
+			//This name comes AFTER
+			return 1;
+		}
 	}
 }

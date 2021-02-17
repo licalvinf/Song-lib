@@ -25,6 +25,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.MenuItem;
 import javafx.stage.Stage;
 import songlib.resources.Song;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType; 
 
 
 public class SonglibController {
@@ -45,6 +47,7 @@ public class SonglibController {
 	@FXML MenuItem saveCSV;
 	private ObservableList<Song> songListObj; //-- Andrew 02/12/2021
 	private Song selectedSong;
+	private Stage primaryStage;
 	
 	//Inputs: (Song array to be sorted, 0, length of Song array - 1)
 	//Outputs: SORTED Song array
@@ -106,6 +109,7 @@ public class SonglibController {
 			} catch (Exception e) {
 				System.out.println(e);
 			}
+		handleSelection();
 		printSongList(this.songListObj);
 	}
 	
@@ -179,22 +183,25 @@ public class SonglibController {
 			Song addedSong = new Song(name, artist, year, album);
 			//if (binarySearchR>0), display error message.
 			//else:
-			if(searchSongList(addedSong)>0) {
+			if(searchSongList(addedSong)== 0) {
 				// popup error message
+				System.out.println("Hello");
+				sendError(this.primaryStage, "This song already exists!\nTry again!");
 				return;
 			}
 			else
 			{
 			songListObj.add(addedSong);
 			sortSongList();
-			//songView.getSelectionModel().select(searchSongList(addedSong));
-			//handleSelection();
+			songView.getSelectionModel().select(searchSongList(addedSong));
+			handleSelection();
 			}		
 		}
 	}
 	
 	//-- Andrew 02/12/2021
 	public void startList(Stage primaryStage) {
+		this.primaryStage = primaryStage;
 		songListObj = FXCollections.observableArrayList( new Song("Song1", "Artist1", "2000", "Album1"), new Song("SongB", "ArtistA", "2002", "Album2"), new Song("SongA", "ArtistB", "2002", "Album3"));
 		//System.out.println(songListObj);
 		try {
@@ -203,7 +210,11 @@ public class SonglibController {
 			System.out.println(e);
 		}
 		
-		//Default selects first song 
+		//Default selects first song if there ARE songs
+		if(this.songListObj.size() > 0) {
+			songView.getSelectionModel().select(0);
+		}
+		
 		//Show default
 		handleSelection(primaryStage);
 		//Show subsequent selections
@@ -242,6 +253,14 @@ public class SonglibController {
 		songDetails.setText(outputDetails);
 
 	}
+	
+	private void sendError(Stage primaryStage, String errormessage) {
+		Alert message = new Alert(AlertType.ERROR);
+		message.initOwner(primaryStage);
+		message.setContentText(errormessage);
+		message.showAndWait();
+	}
+	
 	public void editSong(ActionEvent e) {
 		Button b = (Button)e.getSource();
 		if(b == editb) {
