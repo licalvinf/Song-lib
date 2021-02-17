@@ -1,7 +1,14 @@
+/*Names:
+	Andrew Cheng (Netid: ac1792)
+	Calvin Li (Netid: cfl53)
+Section: 01*/
 package songlib.app;
 
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import songlib.view.SonglibController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -24,6 +31,21 @@ public class SongLib extends Application {
 		primaryStage.setTitle("Song Library");
 		primaryStage.setResizable(false);
 		primaryStage.show();
+		
+		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+		    @Override
+		    public void handle(WindowEvent e) {
+		    	if(listCtrl.madeChanges) {
+		    		//Do confirm save changes
+		    		if(listCtrl.confirmAlert("Confirm Save", "The program will terminate, but you still have unconfirmed changes. Click OK to save to: \"C:/data/songlibCSV.txt\" and close.")) {
+		    			listCtrl.writeCSV();
+		    		}
+		    	}
+		    	//System.out.println("Program closed");
+		    	Platform.exit();
+		    	System.exit(0);
+		    }
+		  });
 		
 		
 		

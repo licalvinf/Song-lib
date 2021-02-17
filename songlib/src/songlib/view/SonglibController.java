@@ -1,3 +1,7 @@
+/*Names:
+	Andrew Cheng (Netid: ac1792)
+	Calvin Li (Netid: cfl53)
+Section: 01*/
 package songlib.view;
 
 
@@ -12,7 +16,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-
+import java.util.Optional;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -20,6 +24,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -47,6 +52,8 @@ public class SonglibController {
 	@FXML MenuItem saveCSV;
 	private ObservableList<Song> songListObj; //-- Andrew 02/12/2021
 	private Song selectedSong;
+	private Stage primaryStage;
+	public boolean madeChanges;
 	
 	//Inputs: (Song array to be sorted, 0, length of Song array - 1)
 	//Outputs: SORTED Song array
@@ -131,19 +138,14 @@ public class SonglibController {
 		return returnObj;
 	}
 	
-	
-	public void printArray(Song[] songList) {
-		for (int i = 0; i < songList.length; i++) {
-			System.out.print(songList[i] );
-			System.out.print(" ");
-		}
-		System.out.println();
-		System.out.println();
-	}
-	
 	public void addSong(ActionEvent e) {
 		Button b = (Button)e.getSource();
 		if(b == addb) {
+			
+			if(!confirmAlert("Add confirmation", "Are you sure you want to add this song?")) {
+				return;
+			}
+			
 			String name = null; String artist=null; String year=null; String album=null;
 			if(nameadd.getText().isBlank() || artistadd.getText().isBlank() ) {
 				errorAlert("Add Alert","The song's name and artist must be filled out. The addition was cancelled.");
@@ -182,10 +184,12 @@ public class SonglibController {
 			}
 			else
 			{
+			//Make changes
 			songListObj.add(addedSong);
 			sortSongList();
 			songView.getSelectionModel().select(searchSongList(addedSong));
 			handleSelection();
+			this.madeChanges = true;
 			}	
 			
 		}
@@ -193,6 +197,8 @@ public class SonglibController {
 	
 	//-- Andrew 02/12/2021
 	public void startList(Stage primaryStage) {
+		this.primaryStage = primaryStage;
+		this.madeChanges = false;
 		this.songListObj = FXCollections.observableArrayList(new ArrayList<Song>());
 		//System.out.println(songListObj);
 		//this.songListObj = null;
@@ -208,6 +214,9 @@ public class SonglibController {
 		//Show subsequent selections
 		songView.getSelectionModel().selectedIndexProperty()
 		.addListener((obj, before, after) -> handleSelection(primaryStage));; //Set selection listener
+		
+		//Load Songs
+		readCSV();
 	}
 	
 	//Handles songView selection
@@ -217,11 +226,14 @@ public class SonglibController {
 			songDetails.setText("");
 			return;
 		}
+		
+	
+		
 		this.selectedSong = songView.getSelectionModel().getSelectedItem();
 		String[] songElements = selectedSong.getDetails().split("\n");
 		String name = songElements[0]; String artist = songElements[1];
 		String album = songElements[3]; String year = songElements[2];
-		String outputDetails = String.format("Name:\t\t%s\nArtist:\t\t%s\nAlbum:\t\t%s\nYear:\t\t\t%s", name, artist, album, year);
+		String outputDetails = String.format("Name:\t\t%s\nArtist:\t\t%s\nYear:\t\t\t%s\nAlbum:\t\t%s", name, artist, year, album);
 		//System.out.println(outputDetails);
 		songDetails.setText(outputDetails);
 
@@ -236,21 +248,38 @@ public class SonglibController {
 		String[] songElements = selectedSong.getDetails().split("\n");
 		String name = songElements[0]; String artist = songElements[1];
 		String album = songElements[3]; String year = songElements[2];
-		String outputDetails = String.format("Name:\t\t%s\nArtist:\t\t%s\nAlbum:\t\t%s\nYear:\t\t\t%s", name, artist, album, year);
+		String outputDetails = String.format("Name:\t\t%s\nArtist:\t\t%s\nYear:\t\t\t%s\nAlbum:\t\t%s", name, artist, year, album);
 		//System.out.println(outputDetails);
 		songDetails.setText(outputDetails);
 
 	}
 	public void errorAlert(String header, String message) {
 		Alert noSelectAlert = new Alert(AlertType.ERROR);
+		noSelectAlert.initOwner(this.primaryStage);
 		noSelectAlert.setTitle("Error");
 		noSelectAlert.setHeaderText(header);
 		noSelectAlert.setContentText(message);
-		noSelectAlert.show();
+		noSelectAlert.showAndWait();
 	}
+	
+	public boolean confirmAlert(String header, String message) {
+		Alert noSelectAlert = new Alert(AlertType.CONFIRMATION);
+		noSelectAlert.initOwner(this.primaryStage);
+		noSelectAlert.setTitle("Confirm task");
+		noSelectAlert.setHeaderText(header);
+		noSelectAlert.setContentText(message);
+		Optional<ButtonType> button_pressed = noSelectAlert.showAndWait();
+		if (button_pressed.get() == ButtonType.OK){return true;} 
+		else {return false;}
+	}
+	
 	public void editSong(ActionEvent e) {
 		Button b = (Button)e.getSource();
 		if(b == editb) {
+			if(!confirmAlert("Edit confirmation", "Are you sure you want to edit this song?")) {
+				return;
+			}
+			
 			if(songView.getSelectionModel().isEmpty()) {
 				errorAlert("Illegal Edit", "No song was selected.");
 				nameedit.setText("");
@@ -277,7 +306,7 @@ public class SonglibController {
 				tempSong.album = albumedit.getText().trim();
 			}
 			
-			if((!(nameedit.getText().isBlank()))&&(!(artistedit.getText().isBlank()))) {
+			if((!(nameedit.getText().isBlank()))||(!(artistedit.getText().isBlank()))) {
 				if(searchSongList(tempSong)>=0) {
 					errorAlert("Edit Alert","A song with the same name and artist already exists. The edit was cancelled.");	
 					nameedit.setText("");
@@ -287,7 +316,10 @@ public class SonglibController {
 					return;
 				}
 			}
-	
+			
+			//Made changes
+			this.madeChanges = true;
+			
 			songListObj.remove(songView.getSelectionModel().getSelectedIndex());
 			songListObj.add(tempSong);
 			sortSongList();
@@ -304,6 +336,10 @@ public class SonglibController {
 	public void deleteSong(ActionEvent e) {
 		Button b = (Button)e.getSource();
 		if(b == deleteb){
+			if(!confirmAlert("Delete confirmation", "Are you sure you want to delete this song?")) {
+				return;
+			}
+			
 			if(songView.getItems().isEmpty()) {
 				return;
 			}
@@ -311,8 +347,56 @@ public class SonglibController {
 			songListObj.remove(currIndex);
 			songView.getSelectionModel().select(currIndex);
 			handleSelection();
+			
+			//Made changes
+			this.madeChanges = true;
 		}
 	}
+
+	public void readCSV() {
+			File file = new File("C:/data/songlibCSV.txt");
+			if(!file.exists()) {
+				return;
+			}
+			try (BufferedReader bufferedReaderNull = new BufferedReader(new FileReader(file));) {
+				if(bufferedReaderNull.readLine()==null) {
+					//errorAlert("Read Error","File is empty");
+					bufferedReaderNull.close();
+					return;
+				}
+				bufferedReaderNull.close();
+				try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file));){
+				String line = bufferedReader.readLine();
+				String tempSong=null; String tempArtist=null; String tempYear=null; String tempAlbum=null;
+				String[] lineParts = line.split("\\|");
+				tempSong = lineParts[0];
+				tempArtist = lineParts[1];
+				tempYear = lineParts[2];
+				tempAlbum = lineParts[3];
+				line = bufferedReader.readLine();	
+				songListObj.setAll(new Song(tempSong, tempArtist, tempYear, tempAlbum));
+				songView.getSelectionModel().select(0);
+				handleSelection();
+				while (line!=null) {
+					lineParts = line.split("\\|");
+					tempSong = lineParts[0];
+					tempArtist = lineParts[1];
+					tempYear = lineParts[2];
+					tempAlbum = lineParts[3];
+					songListObj.add(new Song(tempSong, tempArtist, tempYear, tempAlbum));	
+					line = bufferedReader.readLine();
+				}
+				//Reset changes
+				this.madeChanges = false;
+				bufferedReader.close();
+				} catch (IOException e2) {
+					e2.printStackTrace();
+				}
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+	}	
+	
 public void readCSV(ActionEvent e) {
 		MenuItem m = (MenuItem)e.getSource();
 		if(m == openCSV) {
@@ -348,6 +432,8 @@ public void readCSV(ActionEvent e) {
 					songListObj.add(new Song(tempSong, tempArtist, tempYear, tempAlbum));	
 					line = bufferedReader.readLine();
 				}
+				//Reset changes
+				this.madeChanges = false;
 				bufferedReader.close();
 				} catch (IOException e2) {
 					e2.printStackTrace();
@@ -368,12 +454,31 @@ public void readCSV(ActionEvent e) {
 				for (Song s : songListObj) {
 					bufferedWriter.write(s.getCSV() +"\n");
 				}
+				//Reset changes
+				this.madeChanges = false;
 				bufferedWriter.close();
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
 		}
 		
+	}
+	
+	public void writeCSV() {
+			File file = new File("C:/data/songlibCSV.txt");
+			if (!file.exists()) {
+				file.getParentFile().mkdirs();
+			}
+			try (BufferedWriter bufferedWriter  = new BufferedWriter(new FileWriter(file, false));) {
+				for (Song s : songListObj) {
+					bufferedWriter.write(s.getCSV() +"\n");
+				}
+				//Reset changes
+				this.madeChanges = false;
+				bufferedWriter.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 	}
 		
 		

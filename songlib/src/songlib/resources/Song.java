@@ -1,3 +1,7 @@
+/*Names:
+	Andrew Cheng (Netid: ac1792)
+	Calvin Li (Netid: cfl53)
+Section: 01*/
 package songlib.resources;
 
 public class Song {
