@@ -90,7 +90,7 @@ public class SonglibController {
 	}
 	
 	//Inputs: (Song array, 0, Song array length - 1, Song to search)
-	//Outputs: Index: -1 if not found, otherwise positive index where target is found
+	//Outputs: Index: -1 if not found, otherwise 0 where target is found
 	private int binarySearchR(Song[] array, int startIndex , int endIndex, Song target) {
 		if(array.length == 0 || startIndex > endIndex) {return -1;}
 		int m = startIndex + (endIndex - startIndex + 1)/2;
@@ -108,7 +108,6 @@ public class SonglibController {
 			} catch (Exception e) {
 				System.out.println(e);
 			}
-		//printSongList(this.songListObj);
 	}
 	
 	private int searchSongList(Song target) {
@@ -132,15 +131,6 @@ public class SonglibController {
 		return returnObj;
 	}
 	
-	/*private void printSongList(ObservableList<Song> input) {
-		for(int i = 0; i<input.size(); i++) {
-			System.out.print(input.get(i) );
-			System.out.print(" \n");
-		}
-		System.out.println();
-		System.out.println();
-	}
-	*/
 	
 	public void printArray(Song[] songList) {
 		for (int i = 0; i < songList.length; i++) {
@@ -180,31 +170,32 @@ public class SonglibController {
 				album = albumadd.getText().trim();
 			}
 			
-			nameadd.setText("");
-			artistadd.setText("");
-			yearadd.setText("");
-			albumadd.setText("");
-			Song addedSong = new Song(name, artist, year, album);
-			//if (binarySearchR>0), display error message.
-			//else:
-			if(searchSongList(addedSong)>=0) {
-				errorAlert("Add Alert","A song with this name and artist already exists. The song could not be added.");
-				return;
+			if(!(nameedit.getText().isBlank())&&!(artistedit.getText().isBlank())) {
+				if(searchSongList(tempSong)>=0) {
+					errorAlert("Edit Alert","A song with the same name and artist already exists. The edit was cancelled.");	
+					return;
+				}
 			}
 			else
 			{
-			songListObj.add(addedSong);
-			sortSongList();
-			songView.getSelectionModel().select(searchSongList(addedSong));
-			handleSelection();
-			}		
+				songListObj.remove(songView.getSelectionModel().getSelectedIndex());
+				songListObj.add(tempSong);
+				sortSongList();
+				songView.getSelectionModel().select(searchSongList(tempSong));
+				handleSelection();
+			}
+			nameedit.setText("");
+			artistedit.setText("");
+			yearedit.setText("");
+			albumedit.setText("");
 		}
 	}
 	
 	//-- Andrew 02/12/2021
 	public void startList(Stage primaryStage) {
-		songListObj = FXCollections.observableArrayList( new Song("Song1", "Artist1", "2000", "Album1"), new Song("SongB", "ArtistA", "2002", "Album2"), new Song("SongA", "ArtistB", "2002", "Album3"));
+		this.songListObj = FXCollections.observableArrayList(new ArrayList());
 		//System.out.println(songListObj);
+		//this.songListObj = null;
 		try {
 		songView.setItems(songListObj);
 		} catch (Exception e) {
@@ -269,6 +260,10 @@ public class SonglibController {
 				return;
 			}
 			Song tempSong = new Song(this.selectedSong.name,this.selectedSong.artist,this.selectedSong.year,this.selectedSong.album);
+			if(nameedit.getText().isBlank() && artistedit.getText().isBlank() && yearedit.getText().isBlank() && albumedit.getText().isBlank()) {
+				errorAlert("Edit Alert","No input changes. The edit was cancelled.");
+				return;
+			}
 			if(!(nameedit.getText().isBlank())) {
 				tempSong.name = nameedit.getText().trim();
 			}
@@ -281,12 +276,15 @@ public class SonglibController {
 			if(!(albumedit.getText().isBlank())) {
 				tempSong.album = albumedit.getText().trim();
 			}
-
-			if(!(nameedit.getText().isBlank())&&!(artistedit.getText().isBlank())) {
-				if(searchSongList(tempSong)>=0) {
-					errorAlert("Edit Alert","A song with the same name and artist already exists. The edit was cancelled.");	
-					return;
-				}
+			nameedit.setText("");
+			artistedit.setText("");
+			yearedit.setText("");
+			albumedit.setText("");
+			
+			
+			if(searchSongList(tempSong)>=0) {
+				errorAlert("Illegal Edit!","A song with the same name and artist already exists. The edit was cancelled.");	
+				return;
 			}
 			else
 			{
@@ -296,18 +294,13 @@ public class SonglibController {
 				songView.getSelectionModel().select(searchSongList(tempSong));
 				handleSelection();
 			}
-			nameedit.setText("");
-			artistedit.setText("");
-			yearedit.setText("");
-			albumedit.setText("");
 			
 		}
 	}
 	public void deleteSong(ActionEvent e) {
 		Button b = (Button)e.getSource();
 		if(b == deleteb){
-			if(songView.getSelectionModel().isEmpty()) {
-				errorAlert("Deletion alert","No songs were selected.");
+			if(songView.getItems().isEmpty()) {
 				return;
 			}
 			int currIndex = songView.getSelectionModel().getSelectedIndex();
@@ -316,7 +309,7 @@ public class SonglibController {
 			handleSelection();
 		}
 	}
-	public void readCSV(ActionEvent e) {
+public void readCSV(ActionEvent e) {
 		MenuItem m = (MenuItem)e.getSource();
 		if(m == openCSV) {
 			File file = new File("C:/data/songlibCSV.txt");
@@ -383,3 +376,4 @@ public class SonglibController {
 
 	
 }
+
