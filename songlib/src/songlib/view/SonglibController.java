@@ -90,7 +90,7 @@ public class SonglibController {
 	}
 	
 	//Inputs: (Song array, 0, Song array length - 1, Song to search)
-	//Outputs: Index: -1 if not found, otherwise positive index where target is found
+	//Outputs: Index: -1 if not found, otherwise 0 where target is found
 	private int binarySearchR(Song[] array, int startIndex , int endIndex, Song target) {
 		if(array.length == 0 || startIndex > endIndex) {return -1;}
 		int m = startIndex + (endIndex - startIndex + 1)/2;
@@ -202,8 +202,9 @@ public class SonglibController {
 	
 	//-- Andrew 02/12/2021
 	public void startList(Stage primaryStage) {
-		songListObj = FXCollections.observableArrayList( new Song("Song1", "Artist1", "2000", "Album1"), new Song("SongB", "ArtistA", "2002", "Album2"), new Song("SongA", "ArtistB", "2002", "Album3"));
+		this.songListObj = FXCollections.observableArrayList(new ArrayList());
 		//System.out.println(songListObj);
+		//this.songListObj = null;
 		try {
 		songView.setItems(songListObj);
 		} catch (Exception e) {
@@ -268,6 +269,10 @@ public class SonglibController {
 				return;
 			}
 			Song tempSong = new Song(this.selectedSong.name,this.selectedSong.artist,this.selectedSong.year,this.selectedSong.album);
+			if(nameedit.getText().isBlank() && artistedit.getText().isBlank() && yearedit.getText().isBlank() && albumedit.getText().isBlank()) {
+				errorAlert("Edit Alert","No input changes. The edit was cancelled.");
+				return;
+			}
 			if(!(nameedit.getText().isBlank())) {
 				tempSong.name = nameedit.getText().trim();
 			}
@@ -284,8 +289,10 @@ public class SonglibController {
 			artistedit.setText("");
 			yearedit.setText("");
 			albumedit.setText("");
+			
+			
 			if(searchSongList(tempSong)>=0) {
-				errorAlert("Edit Alert","A song with the same name and artist already exists. The edit was cancelled.");	
+				errorAlert("Illegal Edit!","A song with the same name and artist already exists. The edit was cancelled.");	
 				return;
 			}
 			else
@@ -312,10 +319,12 @@ public class SonglibController {
 		}
 	}
 	public void readCSV(ActionEvent e) {
+		
 		MenuItem m = (MenuItem)e.getSource();
 		if(m == openCSV) {
 			File file = new File("C:/data/songlibCSV.txt");
 			if(!file.exists()) {
+				errorAlert("Load error!", "File does NOT exist");
 				return;
 			}
 			try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file));) {
