@@ -101,6 +101,11 @@ public class SonglibController {
 		Song[] convertedArr = O2A(this.songListObj);
 		Song[] sortedArr = mergeSortR(convertedArr, 0, convertedArr.length - 1);
 		this.songListObj = A2O(sortedArr);
+		try {
+			songView.setItems(songListObj);
+			} catch (Exception e) {
+				System.out.println(e);
+			}
 		printSongList(this.songListObj);
 	}
 	
@@ -174,8 +179,17 @@ public class SonglibController {
 			Song addedSong = new Song(name, artist, year, album);
 			//if (binarySearchR>0), display error message.
 			//else:
+			if(searchSongList(addedSong)>0) {
+				// popup error message
+				return;
+			}
+			else
+			{
 			songListObj.add(addedSong);
-			//call mergesort function		
+			sortSongList();
+			//songView.getSelectionModel().select(searchSongList(addedSong));
+			//handleSelection();
+			}		
 		}
 	}
 	
@@ -231,7 +245,7 @@ public class SonglibController {
 	public void editSong(ActionEvent e) {
 		Button b = (Button)e.getSource();
 		if(b == editb) {
-			Song tempSong = this.selectedSong;
+			Song tempSong = new Song(this.selectedSong.name,this.selectedSong.year,this.selectedSong.artist,this.selectedSong.album);
 			if(!(nameedit.getText().isEmpty())) {
 				tempSong.name = nameedit.getText();
 			}
@@ -248,15 +262,19 @@ public class SonglibController {
 			artistedit.setText("");
 			yearedit.setText("");
 			albumedit.setText("");
+			if(searchSongList(tempSong)>0) {
+
+				return;
+			}
+			else
+			{
+				this.selectedSong = tempSong;
+				sortSongList();
+				songView.getSelectionModel().select(searchSongList(this.selectedSong));
+				handleSelection();
+			}
 			//if (binarySearchR>0), display error message.
 			//else:
-			this.selectedSong = tempSong;
-			handleSelection();
-			try {
-				songView.setItems(songListObj);
-				} catch (Exception e1) {
-					System.out.println(e1);
-				}
 			//call mergesort function
 		}
 	}
